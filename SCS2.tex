@@ -556,6 +556,8 @@ the canonical prefix is \xmlel{cs:}.
         <xs:element name="maxRecords" type="xs:positiveInteger" minOccurs="0"
                   maxOccurs="1" />
         <xs:element name="verbosity" type="xs:boolean" />
+        <xs:element name="maxCone" type="xs:positiveInteger" minOccurs="0"
+                  maxOccurs="1" />
         <xs:element name="testQuery" type="cs:Query" minOccurs="0"
                   maxOccurs="1" />
       </xs:sequence>
@@ -598,13 +600,27 @@ the canonical prefix is \xmlel{cs:}.
 \item[Occurrence] required
 
 \end{description}
+\item[Element \xmlel{maxCone}]
+\begin{description}
+\item[Type] \xmlel{xs:positiveInteger}
+\item[Meaning] A number of CIRCLE parameters the service will
+                        accept.
+\item[Occurrence] optional
+\item[Comment] A service can accept more than that number, but it
+                        must not fail because of too many cone constraints
+                        if clients pass maxCone or less CIRCLE parameters.
+                        While services should try to support multicone
+                        searches, it is legal for maxCone to be one.
+
+\end{description}
 \item[Element \xmlel{testQuery}]
 \begin{description}
 \item[Type] composite: \xmlel{cs:Query}
-\item[Meaning] A query that will result in at least one
-                        matched record that can be used to test the
-                        service.
+\item[Meaning] Deprecated; use vs:ParamHTTP's testQuery element
+                        instead.
 \item[Occurrence] optional
+\item[Comment] Using testQuery is mildly deprecated.  In new
+                        records, prefer vs:ParamHTTP's testQuery.
 
 \end{description}
 
@@ -616,108 +632,13 @@ the canonical prefix is \xmlel{cs:}.
 
 % /GENERATED
 
-\subsubsection{testQuery and the Query Type}
+For giving a test query (used by validators and similar infrastructure
+components), use a \xmlel{testQuery} on the level of the
+\xmlel{vs:paramHTTP} interface.  Note that because CIRCLE is mandatory
+in SCS2, this testQuery cannot just be \verb|MAXREC=1|.
 
-The \xmlel{testQuery} element is intended to help other VO components (e.g.
-registries, validation services, services that monitor the VO's
-operational health, but typically not end users) test that the service
-is up and operating correctly. It defines an area in which there should
-be at least one but not too many result rows.
-
-For giving a test query, prefer an ConeSearch \xmlel{testQuery} on the
-capability level over the more general \xmlel{testQuery} on the level of
-a \xmlel{vs:paramHTTP} interface because being explicit about a position
-covered may have uses beyond constructing test queries for validation
-purposes.
-
-The \xmlel{cs:Query} type captures the different components of an SCS
-query into separate elements, as defined below:
-
-% GENERATED: !schemadoc ConeSearch-v1.2.xsd Query
-\begin{generated}
-\begingroup
-        \renewcommand*\descriptionlabel[1]{%
-        \hbox to 5.5em{\emph{#1}\hfil}}\vspace{2ex}\noindent\textbf{\xmlel{cs:Query} Type Schema Documentation}
-
-\noindent{\small{}A query to be sent to the service\par}
-
-\vspace{1ex}\noindent\textbf{\xmlel{cs:Query} Type Schema Definition}
-
-\begin{lstlisting}[language=XML,basicstyle=\footnotesize]
-<xs:complexType name="Query" >
-  <xs:sequence >
-    <xs:element name="ra" type="xs:double" />
-    <xs:element name="dec" type="xs:double" />
-    <xs:element name="sr" type="xs:double" />
-    <xs:element name="verb" type="xs:positiveInteger" minOccurs="0" />
-    <xs:element name="catalog" type="xs:string" minOccurs="0" />
-    <xs:element name="extras" type="xs:string" minOccurs="0" />
-  </xs:sequence>
-</xs:complexType>
-\end{lstlisting}
-
-\vspace{0.5ex}\noindent\textbf{\xmlel{cs:Query} Metadata Elements}
-
-\begingroup\small\begin{bigdescription}\item[Element \xmlel{ra}]
-\begin{description}
-\item[Type] floating-point number: \xmlel{xs:double}
-\item[Meaning] The right ascension of the search cone's center in
-                   decimal degrees.
-\item[Occurrence] required
-
-\end{description}
-\item[Element \xmlel{dec}]
-\begin{description}
-\item[Type] floating-point number: \xmlel{xs:double}
-\item[Meaning] The declination of the search cone's center in
-                   decimal degrees.
-\item[Occurrence] required
-
-\end{description}
-\item[Element \xmlel{sr}]
-\begin{description}
-\item[Type] floating-point number: \xmlel{xs:double}
-\item[Meaning] The radius of the search cone in decimal degrees.
-\item[Occurrence] required
-
-\end{description}
-\item[Element \xmlel{verb}]
-\begin{description}
-\item[Type] \xmlel{xs:positiveInteger}
-\item[Meaning] The verbosity level to use where 1 means the bare
-                   minimum set of columns and 3 means the full set of
-                   available columns.
-\item[Occurrence] optional
-
-\end{description}
-\item[Element \xmlel{catalog}]
-\begin{description}
-\item[Type] string: \xmlel{xs:string}
-\item[Meaning] The catalog to query.
-\item[Occurrence] optional
-\item[Comment] Services that can search in more than one table
-                   must give the value TABLE in a test query here.
-
-\end{description}
-\item[Element \xmlel{extras}]
-\begin{description}
-\item[Type] string: \xmlel{xs:string}
-\item[Meaning] any extra (non-standard) parameters that must be
-                   provided (apart from what is part of base URL given
-                   by the accessURL element).
-\item[Occurrence] optional
-\item[Comment] this value should be in the form of name=value
-                   pairs delimited with ampersands (\&).
-
-\end{description}
-
-
-\end{bigdescription}\endgroup
-
-\endgroup
-\end{generated}
-
-% /GENERATED
+The \xmlel{cs:Query} type is deprecated because it has too little
+benefit for the amount of specification work it incurs.
 
 \subsubsection{RegTAP Details Keys}
 
@@ -728,6 +649,8 @@ services must include in their tables if they are given in the registry
 record are marked by an exclamation mark:
 
 \begin{description}
+\item[/capability/maxCone (!)] A number of CIRCLEs the service is
+guaranteed to support
 \item[/capability/maxRecords (!)]The largest number of rows the cone
 search will return
 \item[/capability/maxSR (!)]The largest search radius of a cone search service
