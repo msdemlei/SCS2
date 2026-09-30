@@ -80,13 +80,29 @@
                   </xs:annotation>
                </xs:element>
 
+               <xs:element name="maxCone" type="xs:positiveInteger"
+                     minOccurs="0" maxOccurs="1">
+                  <xs:annotation>
+                     <xs:documentation>
+                        A number of CIRCLE parameters the service will
+                        accept.
+                     </xs:documentation>
+                     <xs:documentation>
+                        A service can accept more than that number, but it
+                        must not fail because of too many cone constraints
+                        if clients pass maxCone or less CIRCLE parameters.
+                        While services should try to support multicone
+                        searches, it is legal for maxCone to be one.
+                     </xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+
                <xs:element name="testQuery" type="cs:Query"
                            minOccurs="0" maxOccurs="1">
                   <xs:annotation>
                      <xs:documentation>
-                        A query that will result in at least one
-                        matched record that can be used to test the
-                        service.
+                        Deprecated; use vs:ParamHTTP's testQuery element
+                        instead.
                      </xs:documentation>
                      <xs:documentation>
                         Using testQuery is mildly deprecated.  In new
@@ -95,21 +111,6 @@
                   </xs:annotation>
                </xs:element>
 
-               <xs:element name="maxCone" type="xs:integer"
-                    minOccurs="0" maxOccurs="1">
-                  <xs:annotation>
-                     <xs:documentation>
-                        The maximum number of CIRCLE parameters the
-                        service is prepared to process in a single request.
-                     </xs:documentation>
-                     <xs:documentation>
-                        A missing maxCone declaration means that there
-                        is no limit enforced.  Clients should still not
-                        expect that requests with bodies exceeding a
-                        few megabytes will successfully be processed.
-                     </xs:documentation>
-                  </xs:annotation>
-               </xs:element>
             </xs:sequence>
          </xs:extension>
       </xs:complexContent>
