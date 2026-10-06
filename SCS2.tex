@@ -285,9 +285,9 @@ is single-valued as well.
 
 The value of \verb|TABLE| is a table name taken from the tableset.  Services
 only offering access to a single table may accept requests without a
-\verb|TABLE| parameter but must accept it and raise an error if the table name
+\verb|TABLE| parameter but must accept it and raise a usage error if the table name
 does not match what they give in their tableset.  For services
-publishing multiple tables, it is an error to not pass \verb|TABLE|.
+publishing multiple tables, it is a usage error to not pass \verb|TABLE|.
 
 For the benefit on non-SCS2 clients, services should declare TABLE with
 a UCD of \ucd{meta.id;meta.table}.
@@ -300,7 +300,7 @@ where implementations are free to return any version with a major
 version number of 1.  VOTables must be selectable as with all media
 types given in DALI.  Without \verb|RESPONSEFORMAT|, SCS2 services must return
 VOTable.\footnote{In other words, a legal
-implementation of \texttt{RESPONSEFORMAT} is to raise an error if anything but
+implementation of \texttt{RESPONSEFORMAT} is to raise a usage error if anything but
 application/x-votable+xml or text/xml is passed to it and ignore the
 parameter otherwise; given that several features of SCS2 are defined in
 terms of VOTable, this is actually the most sensible implementation.}
@@ -356,18 +356,15 @@ explaining which parameter caused the problem.
 SCS2 services respond to requests as defined in DALI sect.~5.  The
 following additional requirements apply:
 
-\begin{itemize}
-\item Error responses should not use a 200 HTTP status code but instead
-4xx when the service sees a client error and a 5xx when the service
-diagnoses an error on its side.
+\subsection{Successful Requests}
 
+\begin{itemize}
 \item The media types text/xml and application/x-votable+xml are treated
 exactly equivalent by SCS2 clients and indicate a VOTable response.
 
-\item All responses, including errors, must be in VOTable unless the
-client has requested a different \verb|RESPONSEFORMAT| for successful
-requests, in which case none of
-the following constraints apply.
+\item All successful responses must be in VOTable unless the
+client has requested a different \verb|RESPONSEFORMAT|,
+in which case none of the following constraints apply.
 
 \item Exactly one \xmlel{FIELD}, the row identifier, must have a UCD of
 \ucd{meta.id;meta.main} and must be an array of VOTable chars; this
@@ -393,6 +390,42 @@ quantities with units, the units must be given in VOUnits syntax
 \xmlel{COOSYS} element.
 \end{itemize}
 
+\subsection{Error Responses}
+
+\begin{itemize}
+\item Where error responses are under the control of SCS software, they
+must come in a text/plain message.  Clients still have to deal with
+errors originating between the client an the server-side SCS
+implementation (e.g., network down, reverse proxy cannot connect), which
+will use standard IP or HTTP semantics.
+
+\item The content of this message must begin with a single word and a
+colon.  Until DALI specifies a more specific list of machine-readable
+error classes, the following table (copied from SIAv2) applies:
+
+\begin{inlinetable}
+\begin{tabular}{ll}
+\sptablerule
+\textbf{Term} & \textbf{Meaning} \cr
+\sptablerule
+UsageFault&Invalid input (e.g. invalid input parameter value)\cr
+TransientFault&Service is not currently able to function\cr
+FatalFault&Service cannot perform requested action\cr
+DefaultFault&General error (not covered above)\cr
+\sptablerule
+\end{tabular}
+\end{inlinetable}
+
+\item After the error class and the colon as defined above, a
+message suitable for presentation to the use must follow.  Clients may
+reflow these messages; hence services should not use any formatting; all
+whitespace in these messages can be treated as a single blank.
+
+\item Error responses should not use a 200 HTTP status code but instead
+4xx when the service sees a client error (in particular, UsageFault-s)
+and a 5xx when the service diagnoses an error on its side
+(TransientFaults will probably always be of this type).
+\end{itemize}
 
 
 \section{Registration of SCS2 Services}
