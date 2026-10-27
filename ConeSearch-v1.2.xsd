@@ -14,15 +14,16 @@
         <vm:targetPrefix>cs</vm:targetPrefix>
       </xs:appinfo>
       <xs:documentation>
-        Implementation of an XML Schema describing a Cone Search Service.
-        Based on "Simple Cone Search: a First Guide for Data Curators",
-        http://www.us-vo.org/metadata/conesearch/.
+        This is the VOResource extension for Simple Cone Search services.
+        It is used for both version 1 and version 2 of the protocol.
       </xs:documentation>
       <xs:documentation>
         This schema defines a Capability type that is specific to Cone
         Search.  A service that has ConeSearch capability should be
-        registered as a TabularSkyService.  The ConeSearch capability
-        element must include a ParamHTTP interface.
+        registered as a CatalogService, but clients are advised that neither
+        the resource type nor even the capability type should be used to
+        discover SCS services; only the standardID on the capability is
+        relevant for that.
       </xs:documentation>
    </xs:annotation>
 
